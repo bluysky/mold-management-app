@@ -22,7 +22,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
   },
-  "homepage": "https://github.com/bluysky/mold",
+  "homepage": "https://github.com/bluysky/mold-management-app",
   "browserslist": {
     "production": [
       ">0.2%",
