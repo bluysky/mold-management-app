@@ -1,26 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import { supabase } from './supabaseClient';
 import Auth from './components/Auth';
 import MoldManager from './components/MoldManager';
 
-function App() {
-  const [session, setSession] = useState(null);
+const ProtectedRoute = ({ children }) => {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) navigate('/');
+      else setUser(user);
+    };
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-  }, []);
+    fetchUser();
+  }, [navigate]);
 
+  return user ? children : null;
+};
+
+const App = () => {
   return (
-    <div className="App">
-      {session ? <MoldManager /> : <Auth />}
-    </div>
+    <Router basename="/bluysky/mold-management-app">
+      <Routes>
+        <Route path="/" element={<Auth />} />
+        <Route path="/mold-management" element={<ProtectedRoute><MoldManager /></ProtectedRoute>} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
