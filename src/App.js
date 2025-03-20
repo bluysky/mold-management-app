@@ -26,12 +26,14 @@ const ProtectedRoute = ({ children }) => {
 
 const App = () => {
   return (
-    <Router basename="/bluysky/mold-management-app">
-      <Routes>
-        <Route path="/" element={<Auth />} />
-        <Route path="/mold-management" element={<ProtectedRoute><MoldManager /></ProtectedRoute>} />
-      </Routes>
-    </Router>
+<Router>
+  <Routes>
+    <Route path="/" element={<Auth />} />
+    <Route path="/mold-management" element={<ProtectedRoute><MoldManager /></ProtectedRoute>} />
+  </Routes>
+</Router>
+
+
   );
 };
 
