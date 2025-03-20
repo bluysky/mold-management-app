@@ -7,18 +7,21 @@ import MoldManager from './components/MoldManager';
 const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);  // 로딩 상태 추가
 
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) navigate('/');
       else setUser(user);
+      setLoading(false);  // 로딩 완료
     };
 
     fetchUser();
   }, [navigate]);
 
-  return user ? children : null;
+  if (loading) return <div>Loading...</div>; // 로딩 중일 때 메시지 표시
+  return user ? children : <div>Redirecting...</div>;
 };
 
 const App = () => {
