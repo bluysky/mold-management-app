@@ -8,6 +8,7 @@ const MoldManager = () => {
   const [selectedMold, setSelectedMold] = useState(null);
 
   useEffect(() => {
+    console.log('MoldManager 컴포넌트 마운트'); // 로그 추가
     fetchMolds();
   }, []);
 
