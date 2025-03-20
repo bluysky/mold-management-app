@@ -1,27 +1,43 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import './Auth.css';
-import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
+import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignup, setIsSignup] = useState(false);
-  const navigate = useNavigate(); // useNavigate 훅 사용
+  const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지 상태 추가
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = isSignup
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      alert(error.error_description || error.message);
+    setErrorMessage('');
+
+    let response;
+    if (isSignup) {
+      response = await supabase.auth.signUp({ email, password });
     } else {
-      // 에러가 없을 때 페이지 이동
-      navigate('/mold-management'); // 원하는 경로로 변경 가능
+      response = await supabase.auth.signInWithPassword({ email, password });
     }
+
+    console.log("Auth Response:", response); // 로그 출력하여 확인
+
+    const { error, data } = response;
+    
+    if (error) {
+      setErrorMessage(error.message);
+    } else {
+      console.log("User signed in:", data);
+      if (isSignup && !data.user) {
+        setErrorMessage('Check your email to verify your account.'); // 이메일 인증 필요
+      } else {
+        navigate('/mold-management');
+      }
+    }
+
     setLoading(false);
   };
 
@@ -42,8 +58,9 @@ const Auth = () => {
           onChange={(e) => setPassword(e.target.value)}
           className="auth-input"
         />
+        {errorMessage && <p className="auth-error">{errorMessage}</p>} {/* 에러 메시지 표시 */}
         <button type="submit" disabled={loading} className="auth-button">
-          {isSignup ? 'Sign up' : 'Log in'}
+          {loading ? 'Processing...' : isSignup ? 'Sign up' : 'Log in'}
         </button>
       </form>
       <button onClick={() => setIsSignup(!isSignup)} className="auth-toggle-button">
