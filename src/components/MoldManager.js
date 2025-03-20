@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
-import './MoldManager.css'; // 스타일 파일 import
+import './MoldManager.css';
 
 const MoldManager = () => {
   const [molds, setMolds] = useState([]);
@@ -18,19 +18,20 @@ const MoldManager = () => {
   };
 
   const handleCreate = async () => {
-    const { error } = await supabase.from('molds').insert({ ...newMold });
+    const { error } = await supabase.from('molds').insert(newMold);
     if (error) console.error(error);
     else {
-      fetchMolds();
+      await fetchMolds();
       setNewMold({ mold_id: '', status: '', inspection_status: '', inspector: '' });
     }
   };
 
   const handleUpdate = async () => {
-    const { error } = await supabase.from('molds').update({ ...selectedMold }).eq('id', selectedMold.id);
+    if (!selectedMold) return;
+    const { error } = await supabase.from('molds').update(selectedMold).eq('id', selectedMold.id);
     if (error) console.error(error);
     else {
-      fetchMolds();
+      await fetchMolds();
       setSelectedMold(null);
     }
   };
@@ -45,7 +46,6 @@ const MoldManager = () => {
     <div className="mold-manager-container">
       <h2>Mold Management</h2>
 
-      {/* 입력 폼 */}
       <div className="mold-form">
         <input placeholder="Mold ID" value={newMold.mold_id} onChange={(e) => setNewMold({ ...newMold, mold_id: e.target.value })} />
         <input placeholder="Status" value={newMold.status} onChange={(e) => setNewMold({ ...newMold, status: e.target.value })} />
@@ -54,7 +54,6 @@ const MoldManager = () => {
         <button onClick={handleCreate}>Create</button>
       </div>
 
-      {/* 몰드 목록 */}
       <table className="mold-table">
         <thead>
           <tr>
@@ -83,7 +82,6 @@ const MoldManager = () => {
         </tbody>
       </table>
 
-      {/* 수정 폼 */}
       {selectedMold && (
         <div className="mold-form edit-form">
           <input value={selectedMold.mold_id} onChange={(e) => setSelectedMold({ ...selectedMold, mold_id: e.target.value })} />
