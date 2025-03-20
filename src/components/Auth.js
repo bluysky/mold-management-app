@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import './Auth.css'; // 스타일 파일 import
+import './Auth.css';
+import { useNavigate } from 'react-router-dom'; // useNavigate 훅 import
 
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isSignup, setIsSignup] = useState(false); // 모드 전환 상태
+  const [isSignup, setIsSignup] = useState(false);
+  const navigate = useNavigate(); // useNavigate 훅 사용
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,6 +18,9 @@ const Auth = () => {
       : await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       alert(error.error_description || error.message);
+    } else {
+      // 에러가 없을 때 페이지 이동
+      navigate('/mold-management'); // 원하는 경로로 변경 가능
     }
     setLoading(false);
   };
